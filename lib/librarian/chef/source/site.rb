@@ -309,7 +309,11 @@ module Librarian
             subtemps.size > 1 and raise "The package archive has too many children!"
             subtemp = subtemps.first
             debug { "Moving #{relative_path_to(subtemp)} to #{relative_path_to(path)}" }
-            FileUtils.mv(subtemp, path)
+            if Gem.win_platform?
+              system("move /y #{ subtemp } #{ path }")
+            else
+              FileUtils.mv(subtemp, path)
+            end
           ensure
             temp.rmtree if temp && temp.exist?
           end

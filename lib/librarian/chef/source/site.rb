@@ -310,7 +310,13 @@ module Librarian
             subtemp = subtemps.first
             debug { "Moving #{relative_path_to(subtemp)} to #{relative_path_to(path)}" }
             if Gem.win_platform?
-              system("move /y #{ subtemp } #{ path }")
+              winsubtemp = "#{ subtemp }".tr('/', '\\')
+              winpath = "#{ path }".tr('/', '\\')
+              unless (Dir.exist?(winpath))
+                system("mkdir #{ winpath }")
+              end
+              system("xcopy /E /C /Q /H /K /Y #{ winsubtemp } #{ winpath }")
+              system("rmdir /S /Q #{ winsubtemp }")
             else
               FileUtils.mv(subtemp, path)
             end
